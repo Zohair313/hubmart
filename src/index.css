@@ -1,0 +1,71 @@
+:root {
+  --ast-global-color-0: #0085FF;
+  --ast-global-color-1: #0177E3;
+  --ast-global-color-2: #FFFFFF;
+  --ast-global-color-3: #E7F6FF;
+  --ast-global-color-4: #212A37;
+  --ast-global-color-5: #0F172A;
+  --ast-global-color-6: #4F5B62;
+  --ast-global-color-7: #070614;
+  --ast-global-color-8: #222222;
+
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.5;
+  font-weight: 300;
+
+  color-scheme: light dark;
+  color: var(--ast-global-color-3);
+  background-color: var(--ast-global-color-5);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: var(--ast-global-color-2);
+  text-transform: uppercase;
+}
+
+a {
+  font-weight: 500;
+  color: var(--ast-global-color-0);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--ast-global-color-1);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  border-radius: 4px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  background-color: var(--ast-global-color-0);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+button:hover {
+  background-color: var(--ast-global-color-1);
+  border-color: var(--ast-global-color-1);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
