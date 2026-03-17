@@ -10,7 +10,9 @@ const Products = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 4;
 
     const currentCategory = searchParams.get('category') || '';
 
@@ -20,7 +22,12 @@ const Products = () => {
                 const res = await api.get('/store/categories/');
                 setCategories(res.data);
             } catch (err) {
-                console.error("Failed to fetch categories", err);
+                setCategories([
+                    {id: 1, name: 'Grocery', slug: 'grocery'},
+                    {id: 2, name: 'Biscuits', slug: 'biscuits'},
+                    {id: 3, name: 'Crisps', slug: 'crisps'},
+                    {id: 4, name: 'Drinks', slug: 'drinks'}
+                ]);
             }
         };
         fetchMetadata();
@@ -28,24 +35,50 @@ const Products = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            setLoading(true);
+            // Priority 1: Load local data IMMEDIATELY (Instant UI)
+            const localProducts = JSON.parse(localStorage.getItem('demo_products') || '[]');
+            const filterLocal = (data) => data.filter(p => {
+                const searchLower = searchQuery.toLowerCase();
+                const matchesSearch = !searchQuery || 
+                    p.name.toLowerCase().includes(searchLower) || 
+                    (p.category_name && p.category_name.toLowerCase().includes(searchLower));
+                
+                const matchesCat = !currentCategory || p.category_slug === currentCategory;
+                return matchesSearch && matchesCat;
+            });
+
+            const initialLocal = filterLocal(localProducts);
+            setProducts(initialLocal.length === 0 && searchQuery ? localProducts : initialLocal);
+            setLoading(false); // UI is now populated
+
+            // Priority 2: Try to get API data in background
             try {
                 let url = '/store/products/';
                 const params = new URLSearchParams();
                 if (currentCategory) params.append('category__slug', currentCategory);
                 if (searchQuery) params.append('search', searchQuery);
 
-                const res = await api.get(`${url}?${params.toString()}`);
-                setProducts(res.data.results || res.data);
+                // Use a short timeout for API to keep it snappy
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1500); 
+
+                const res = await api.get(`${url}?${params.toString()}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                const apiProducts = res.data.results || res.data;
+                const finalFilteredLocal = filterLocal(localProducts);
+                
+                // Merge and show final list
+                setProducts([...finalFilteredLocal, ...apiProducts]);
             } catch (err) {
-                console.error("Failed to fetch products", err);
+                // If API fails (offline), we already have local data showing
+                console.log("API offline, staying with local data");
             }
-            setLoading(false);
         };
 
         const delayDebounceFn = setTimeout(() => {
             fetchProducts();
-        }, 300);
+        }, searchQuery ? 300 : 0); // Only debounce if searching
 
         return () => clearTimeout(delayDebounceFn);
     }, [currentCategory, searchQuery]);
@@ -56,7 +89,19 @@ const Products = () => {
         } else {
             searchParams.set('category', slug);
         }
+        setCurrentPage(1); // Reset to first page on category change
         setSearchParams(searchParams);
+    };
+
+    // Pagination Logic
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(products.length / productsPerPage);
+
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
@@ -109,18 +154,52 @@ const Products = () => {
                     {loading ? (
                         <div className="loader">Synchronizing Ledger...</div>
                     ) : (
-                        <div className="products-grid">
-                            {products.length > 0 ? (
-                                products.map(product => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))
-                            ) : (
-                                <div className="no-results">
-                                    <h3>No items found matching your criteria.</h3>
-                                    <p>Try adjusting your filters or search terms.</p>
+                        <>
+                            <div className="products-grid">
+                                {currentProducts.length > 0 ? (
+                                    currentProducts.map(product => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ))
+                                ) : (
+                                    <div className="no-results">
+                                        <h3>No items found matching your criteria.</h3>
+                                        <p>Try adjusting your filters or search terms.</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {products.length > productsPerPage && (
+                                <div className="pagination-premium glass">
+                                    <button 
+                                        onClick={() => paginate(currentPage - 1)} 
+                                        disabled={currentPage === 1}
+                                        className="pag-btn"
+                                    >
+                                        Prev
+                                    </button>
+                                    
+                                    <div className="page-numbers">
+                                        {[...Array(totalPages)].map((_, i) => (
+                                            <button 
+                                                key={i + 1}
+                                                onClick={() => paginate(i + 1)}
+                                                className={`page-num ${currentPage === i + 1 ? 'active' : ''}`}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <button 
+                                        onClick={() => paginate(currentPage + 1)} 
+                                        disabled={currentPage === totalPages}
+                                        className="pag-btn"
+                                    >
+                                        Next
+                                    </button>
                                 </div>
                             )}
-                        </div>
+                        </>
                     )}
                 </main>
             </div>

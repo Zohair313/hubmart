@@ -6,20 +6,21 @@ import { CartProvider } from './context/CartContext';
 import { SocketProvider } from './context/SocketContext';
 import Navbar from './components/Navbar';
 import SupportWidget from './components/SupportWidget';
-import Home from './pages/Home';
-import Products from './pages/Products';
-import Cart from './pages/Cart';
-import Login from './pages/Login';
-import Checkout from './pages/Checkout';
-import Success from './pages/Success';
-import Cancel from './pages/Cancel';
-import AdminProducts from './pages/AdminProducts';
-import Shipping from './pages/Shipping';
-import Returns from './pages/Returns';
-import Contact from './pages/Contact';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import AboutUs from './pages/AboutUs';
+const Home = React.lazy(() => import('./pages/Home'));
+const Products = React.lazy(() => import('./pages/Products'));
+const Cart = React.lazy(() => import('./pages/Cart'));
+const Login = React.lazy(() => import('./pages/Login'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const Success = React.lazy(() => import('./pages/Success'));
+const Cancel = React.lazy(() => import('./pages/Cancel'));
+const AdminProducts = React.lazy(() => import('./pages/AdminProducts'));
+const Shipping = React.lazy(() => import('./pages/Shipping'));
+const Returns = React.lazy(() => import('./pages/Returns'));
+const Contact = React.lazy(() => import('./pages/Contact'));
+const Terms = React.lazy(() => import('./pages/Terms'));
+const Privacy = React.lazy(() => import('./pages/Privacy'));
+const AboutUs = React.lazy(() => import('./pages/AboutUs'));
+const Profile = React.lazy(() => import('./pages/Profile'));
 import './styles/index.css';
 
 const App = () => {
@@ -42,28 +43,30 @@ const App = () => {
             <div className={`app ${theme}`}>
               <Navbar toggleTheme={toggleTheme} currentTheme={theme} />
               <main>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/checkout/success" element={<Success />} />
-                  <Route path="/checkout/cancel" element={<Cancel />} />
-                  <Route path="/admin/products" element={<AdminProducts />} />
-                  <Route path="/shipping" element={<Shipping />} />
-                  <Route path="/returns" element={<Returns />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/about-us" element={<AboutUs />} />
-                  <Route path="/profile" element={<div className="container" style={{ padding: '5rem' }}><h2>Profile Page Coming Soon</h2><Link to="/" className="btn-primary" style={{ marginTop: '2rem' }}>Back Home</Link></div>} />
-                </Routes>
+                <React.Suspense fallback={<div className="loader" style={{ padding: '8rem', textAlign: 'center' }}>Initializing...</div>}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/checkout/success" element={<Success />} />
+                    <Route path="/checkout/cancel" element={<Cancel />} />
+                    <Route path="/admin/products" element={<AdminProducts />} />
+                    <Route path="/shipping" element={<Shipping />} />
+                    <Route path="/returns" element={<Returns />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/about-us" element={<AboutUs />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Routes>
+                </React.Suspense>
               </main>
 
               <SupportWidget />
 
-              <footer style={{ background: 'var(--footer-bg)', color: 'var(--footer-text)', padding: '5rem 0 2rem', marginTop: '6rem', borderTop: '1px solid rgba(212, 175, 55, 0.2)' }}>
+              <footer className="footer-premium" style={{ background: 'var(--footer-bg)', color: 'var(--footer-text)', padding: '5rem 0 2rem', borderTop: '1px solid rgba(212, 175, 55, 0.2)' }}>
                 <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '4rem' }}>
                   {/* OUR GOAL */}
                   <div>

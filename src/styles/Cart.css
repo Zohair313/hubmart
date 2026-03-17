@@ -68,7 +68,7 @@
 .item-name {
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--text-main);
     font-family: 'Playfair Display', serif;
 }
 
@@ -101,7 +101,7 @@
 }
 
 .qty-btn:hover {
-    color: var(--primary);
+    color: var(--accent);
 }
 
 .qty-val {
@@ -113,7 +113,7 @@
 .item-total {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary);
+    color: var(--text-main);
     min-width: 100px;
     text-align: right;
 }
@@ -142,7 +142,7 @@
     padding: 2.5rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    background: white;
+    background: var(--bg-card);
 }
 
 .summary-card h3 {
@@ -171,7 +171,7 @@
 .summary-row.total {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--text-main);
     margin-bottom: 2rem;
 }
 

@@ -9,6 +9,17 @@ const Navbar = ({ toggleTheme, currentTheme }) => {
     const { user, logout } = useAuth();
     const { items } = useCart();
     const navigate = useNavigate();
+    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery('');
+            setIsSearchOpen(false);
+        }
+    };
 
     return (
         <nav className="navbar luxury-nav">
@@ -35,6 +46,7 @@ const Navbar = ({ toggleTheme, currentTheme }) => {
                         </div>
                         <Link to="/contact" className="nav-link-premium">CONTACT US</Link>
                         <Link to="/about-us" className="nav-link-premium">ABOUT US</Link>
+                        {user && <Link to="/admin/products" className="nav-link-premium" style={{ color: '#d4af37' }}>ADD PRODUCT</Link>}
                     </div>
 
                     <div className="nav-actions-premium">
@@ -42,7 +54,20 @@ const Navbar = ({ toggleTheme, currentTheme }) => {
                             {currentTheme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
                         </button>
 
-                        <button className="icon-btn-premium search-trigger"><Search size={20} /></button>
+                        <div className={`search-container-premium ${isSearchOpen ? 'active' : ''}`}>
+                            <form onSubmit={handleSearch}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Search products..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    autoFocus={isSearchOpen}
+                                />
+                            </form>
+                            <button className="icon-btn-premium search-trigger" onClick={() => setIsSearchOpen(!isSearchOpen)}>
+                                <Search size={20} />
+                            </button>
+                        </div>
 
                         <Link to="/cart" className="icon-btn-premium cart-trigger">
                             <ShoppingCart size={22} />
@@ -52,7 +77,11 @@ const Navbar = ({ toggleTheme, currentTheme }) => {
                         {user ? (
                             <div className="user-control-premium">
                                 <Link to="/profile" className="user-name">
-                                    <User size={20} /> {user.first_name || 'Account'}
+                                    <div className="user-avatar-wrapper">
+                                        <User size={20} />
+                                        <span className="active-dot"></span>
+                                    </div>
+                                    {user.first_name || 'Account'}
                                 </Link>
                                 <button onClick={() => { logout(); navigate('/'); }} className="logout-trigger">
                                     <LogOut size={18} />

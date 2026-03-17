@@ -39,23 +39,23 @@
     gap: 1.25rem;
 }
 
-.input-group {
+.login-container .input-group {
     display: flex;
     align-items: center;
     gap: 1rem;
     padding: 0.875rem 1.25rem;
-    background: white;
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
 }
 
-.input-group:focus-within {
+.login-container .input-group:focus-within {
     border-color: var(--accent);
     box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
 }
 
-.input-group svg {
+.login-container .input-group svg {
     color: var(--text-muted);
 }
 

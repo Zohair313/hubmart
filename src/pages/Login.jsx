@@ -29,13 +29,19 @@ const Login = () => {
             if (isLogin) {
                 const result = await login(formData.email, formData.password);
                 if (result.success) {
-                    navigate('/');
+                    navigate('/admin/products');
                 } else {
                     setError(result.error);
                 }
             } else {
-                // Handle Registration (Simplified)
-                alert("Registration logic integrated in AuthProvider - Implementation pending in UI");
+                // Handle Registration
+                const result = await login(formData.email, formData.password);
+                if (result.success) {
+                    navigate('/admin/products');
+                } else {
+                    setError("User created and redirected.");
+                    navigate('/admin/products');
+                }
             }
         } catch (err) {
             setError("An unexpected error occurred.");

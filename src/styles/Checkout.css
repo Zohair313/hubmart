@@ -71,8 +71,9 @@
     font-family: inherit;
     font-size: 1rem;
     outline: none;
-    background: white;
-    transition: border-color 0.2s;
+    background: var(--bg-card);
+    color: var(--text-main);
+    transition: all 0.2s;
 }
 
 .form-grid input:focus {
@@ -120,7 +121,7 @@
     padding: 2.5rem;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border);
-    background: white;
+    background: var(--bg-card);
 }
 
 .order-summary-box h3 {
@@ -149,7 +150,7 @@
 
 .mini-name {
     font-weight: 600;
-    color: var(--primary);
+    color: var(--text-main);
     font-family: 'Playfair Display', serif;
 }
 
@@ -160,6 +161,7 @@
 
 .mini-price {
     font-weight: 700;
+    color: var(--text-main);
 }
 
 .summary-total {
@@ -169,7 +171,7 @@
     justify-content: space-between;
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--primary);
+    color: var(--text-main);
 }
 
 @media (max-width: 968px) {

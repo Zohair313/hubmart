@@ -57,6 +57,18 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.app {
+  background-color: var(--bg-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
 }
 
 h1,
@@ -155,14 +167,15 @@ button {
 }
 
 .btn-outline {
-  border: 1px solid var(--primary);
-  color: var(--primary);
+  border: 1px solid var(--text-main);
+  color: var(--text-main);
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius);
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .btn-outline:hover {
-  background-color: var(--primary);
-  color: white;
+  background-color: var(--text-main);
+  color: var(--bg-main);
 }

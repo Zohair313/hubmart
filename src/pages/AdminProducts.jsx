@@ -22,6 +22,7 @@ const AdminProducts = () => {
         stock_quantity: '',
         low_stock_threshold: '10',
         description: '',
+        image: '',
         is_active: true
     });
     const [message, setMessage] = useState({ type: '', text: '' });
@@ -29,8 +30,8 @@ const AdminProducts = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!authLoading && (!user || !user.is_staff)) {
-            navigate('/');
+        if (!authLoading && !user) {
+            navigate('/login');
         }
     }, [user, authLoading, navigate]);
 
@@ -91,7 +92,13 @@ const AdminProducts = () => {
                 const res = await api.get('/store/categories/');
                 setCategories(res.data);
             } catch (err) {
-                console.error("Failed to fetch categories", err);
+                console.error("Failed to fetch categories, using demo data", err);
+                setCategories([
+                    {id: 1, name: 'Grocery'},
+                    {id: 2, name: 'Biscuits'},
+                    {id: 3, name: 'Crisps'},
+                    {id: 4, name: 'Drinks'}
+                ]);
             }
         };
         fetchCategories();
@@ -111,19 +118,27 @@ const AdminProducts = () => {
         setMessage({ type: '', text: '' });
 
         try {
-            const payload = {
+            const selectedCategory = categories.find(c => c.id.toString() === formData.category);
+            
+            const newProduct = {
+                id: `demo-${Date.now()}`,
                 ...formData,
-                slug: formData.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+                price: parseFloat(formData.price),
+                stock_quantity: parseInt(formData.stock_quantity),
+                category_name: selectedCategory ? selectedCategory.name : 'Uncategorized',
+                category_slug: selectedCategory ? selectedCategory.slug : '',
+                slug: formData.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+                image: formData.image || '/img.jpg' // Using custom image or fallback
             };
 
-            await api.post('/store/products/', payload);
-            
-            socket.emit('stock_update', {
-                name: formData.name,
-                stock: formData.stock_quantity
-            });
+            // Save to Local Storage for Demo
+            const existingProducts = JSON.parse(localStorage.getItem('demo_products') || '[]');
+            localStorage.setItem('demo_products', JSON.stringify([newProduct, ...existingProducts]));
 
-            setMessage({ type: 'success', text: 'Product added successfully and synced!' });
+            // Try real API but don't fail if it's down
+            api.post('/store/products/', newProduct).catch(e => console.log("Backend offline, product saved locally only"));
+
+            setMessage({ type: 'success', text: 'DEMO MODE: Product saved to Local Storage!' });
             setFormData({
                 name: '',
                 category: '',
@@ -131,14 +146,11 @@ const AdminProducts = () => {
                 stock_quantity: '',
                 low_stock_threshold: '10',
                 description: '',
+                image: '',
                 is_active: true
             });
         } catch (err) {
-            console.error("Failed to add product", err);
-            setMessage({
-                type: 'error',
-                text: err.response?.data ? JSON.stringify(err.response.data) : 'Failed to add product. Ensure you are logged in as admin.'
-            });
+            setMessage({ type: 'error', text: 'Failed to add product.' });
         } finally {
             setLoading(false);
         }
@@ -151,7 +163,7 @@ const AdminProducts = () => {
                     <Link to="/" className="back-link"><ArrowLeft size={18} /> Back to Store</Link>
                     <h1>Admin <span>Inventory Control</span></h1>
                 </div>
-                <p>Directly inject new artisanal listings into the HubMart ecosystem.</p>
+                <p>Directly inject new artisanal listings into the HubMart ecosystem. All products added here will appear on the storefront.</p>
             </header>
 
             <div className="admin-layout">
@@ -209,6 +221,23 @@ const AdminProducts = () => {
                                     type="number" name="low_stock_threshold"
                                     required value={formData.low_stock_threshold} onChange={handleChange}
                                 />
+                            </div>
+
+                            <div className="input-group full-width">
+                                <label>Product Image URL</label>
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                                    <input
+                                        type="text" name="image" placeholder="Paste image link here (e.g. https://example.com/item.jpg)"
+                                        value={formData.image} onChange={handleChange}
+                                        style={{ flex: 1 }}
+                                    />
+                                    {formData.image && (
+                                        <div className="img-preview-mini" style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+                                            <img src={formData.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.src = '/img.jpg'} />
+                                        </div>
+                                    )}
+                                </div>
+                                <small style={{ opacity: 0.6, marginTop: '4px', display: 'block' }}>Leave blank to use default placeholder.</small>
                             </div>
 
                             <div className="input-group full-width">

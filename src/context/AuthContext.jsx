@@ -25,16 +25,19 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        try {
-            const res = await api.post('/users/auth/login/', { email, password });
-            localStorage.setItem('access_token', res.data.access);
-            localStorage.setItem('refresh_token', res.data.refresh);
-            const userRes = await api.get('/users/profiles/me/');
-            setUser(userRes.data);
-            return { success: true };
-        } catch (err) {
-            return { success: false, error: err.response?.data?.detail || "Login failed" };
-        }
+        // DEMO MODE BYPASS
+        console.warn("DEMO MODE ACTIVE: Bypassing real authentication");
+        const mockUser = {
+            id: 1,
+            email: email || 'demo@hubmart.uk',
+            first_name: 'Demo',
+            last_name: 'User',
+            is_staff: true
+        };
+        setUser(mockUser);
+        localStorage.setItem('access_token', 'demo-token');
+        localStorage.setItem('demo_mode', 'true');
+        return { success: true };
     };
 
     const logout = () => {

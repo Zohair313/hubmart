@@ -1,9 +1,8 @@
 .contact-page {
-    background: #0b1121;
-    color: white;
+    background: var(--bg-main);
+    color: var(--text-main);
     min-height: 100vh;
     padding: 8rem 0;
-    font-family: 'Outfit', sans-serif;
 }
 
 .contact-header {
@@ -12,7 +11,7 @@
 }
 
 .contact-header h2 {
-    color: #3b82f6;
+    color: var(--accent);
     letter-spacing: 4px;
     font-size: 1rem;
     font-weight: 600;
@@ -33,7 +32,7 @@
 }
 
 .info-item h4 {
-    color: #3b82f6;
+    color: var(--accent);
     font-size: 0.85rem;
     letter-spacing: 2px;
     margin-bottom: 1rem;
@@ -41,7 +40,7 @@
 }
 
 .info-item p, .info-item a {
-    color: white;
+    color: var(--text-main);
     font-size: 1.1rem;
     text-decoration: none;
     line-height: 1.6;
@@ -50,12 +49,12 @@
 }
 
 .info-item a:hover {
-    color: #3b82f6;
+    color: var(--accent);
 }
 
 .contact-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--border);
     margin-top: 1rem;
 }
 
@@ -66,13 +65,13 @@
 }
 
 .social-icon {
-    color: white;
+    color: var(--text-main);
     opacity: 0.8;
     transition: 0.3s;
 }
 
 .social-icon:hover {
-    color: #3b82f6;
+    color: var(--accent);
     opacity: 1;
 }
 
@@ -98,40 +97,40 @@
 }
 
 .form-group input, .form-group textarea {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     padding: 1rem;
     border-radius: 6px;
-    color: white;
+    color: var(--text-main);
     font-family: inherit;
     outline: none;
     transition: 0.3s;
 }
 
 .form-group input:focus, .form-group textarea:focus {
-    border-color: #3b82f6;
-    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+    background: var(--bg-card);
 }
 
 .submit-btn-premium {
-    background: #0081ff;
-    color: white;
+    background: var(--accent);
+    color: var(--primary);
     border: none;
-    padding: 1rem 2rem;
+    padding: 1rem 2.5rem;
     border-radius: 6px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     width: fit-content;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     transition: 0.3s;
     margin-top: 1rem;
 }
 
 .submit-btn-premium:hover {
-    background: #0066cc;
+    background: var(--accent-hover);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 129, 255, 0.3);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
 }
 
 @media (max-width: 968px) {

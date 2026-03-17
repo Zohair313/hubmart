@@ -14,9 +14,13 @@ const Home = () => {
         const fetchFeatured = async () => {
             try {
                 const res = await api.get('/store/products/?limit=4');
-                setProducts(res.data.results || res.data);
+                const apiProducts = res.data.results || res.data;
+                const localProducts = JSON.parse(localStorage.getItem('demo_products') || '[]');
+                setProducts([...localProducts, ...apiProducts].slice(0, 8));
             } catch (err) {
-                console.error("Failed to fetch featured products", err);
+                console.error("Failed to fetch featured products, using local only", err);
+                const localProducts = JSON.parse(localStorage.getItem('demo_products') || '[]');
+                setProducts(localProducts);
             }
             setLoading(false);
         };
