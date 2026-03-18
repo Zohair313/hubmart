@@ -21,6 +21,8 @@ const Terms = React.lazy(() => import('./pages/Terms'));
 const Privacy = React.lazy(() => import('./pages/Privacy'));
 const AboutUs = React.lazy(() => import('./pages/AboutUs'));
 const Profile = React.lazy(() => import('./pages/Profile'));
+const AdminLogin = React.lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 import './styles/index.css';
 
 const App = () => {
@@ -60,6 +62,8 @@ const App = () => {
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/about-us" element={<AboutUs />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/Hubmaster" element={<AdminLogin />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
                   </Routes>
                 </React.Suspense>
               </main>

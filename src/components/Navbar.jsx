@@ -46,7 +46,12 @@ const Navbar = ({ toggleTheme, currentTheme }) => {
                         </div>
                         <Link to="/contact" className="nav-link-premium">CONTACT US</Link>
                         <Link to="/about-us" className="nav-link-premium">ABOUT US</Link>
-                        {user && <Link to="/admin/products" className="nav-link-premium" style={{ color: '#d4af37' }}>ADD PRODUCT</Link>}
+                        {user?.is_staff && (
+                            <>
+                                <Link to="/admin/products" className="nav-link-premium" style={{ color: '#d4af37' }}>ADD PRODUCT</Link>
+                                <Link to="/admin/dashboard" className="nav-link-premium" style={{ color: '#d4af37' }}>ADMIN DASHBOARD</Link>
+                            </>
+                        )}
                     </div>
 
                     <div className="nav-actions-premium">
