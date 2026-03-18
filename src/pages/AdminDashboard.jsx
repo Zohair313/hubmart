@@ -3,6 +3,7 @@ import { ShieldAlert, UserPlus, Users, Package, ArrowRight, Save, LayoutDashboar
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/index.css';
+import api from '../api';
 
 const AdminDashboard = () => {
     const { user, loading } = useAuth();
@@ -25,16 +26,21 @@ const AdminDashboard = () => {
         }
     }, [user, loading, navigate]);
 
-    const loadAdmins = () => {
-        const admins = JSON.parse(localStorage.getItem('hubmart_admins')) || [];
-        setAdminsList(admins);
+    const loadAdmins = async () => {
+        try {
+            const res = await api.get('/users/admin/list/');
+            setAdminsList(res.data);
+        } catch (err) {
+            console.error("Failed to load admins:", err);
+            setMessage({ type: 'error', text: 'Failed to connect to backend for admin list.' });
+        }
     };
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleCreateAdmin = (e) => {
+    const handleCreateAdmin = async (e) => {
         e.preventDefault();
         setMessage({ type: '', text: '' });
 
@@ -43,38 +49,37 @@ const AdminDashboard = () => {
             return;
         }
 
-        const admins = JSON.parse(localStorage.getItem('hubmart_admins')) || [];
-        
-        if (admins.find(a => a.email === formData.email)) {
-            setMessage({ type: 'error', text: 'An admin with this email already exists.' });
-            return;
+        try {
+            const newAdmin = {
+                first_name: formData.name.split(' ')[0] || 'Admin',
+                last_name: formData.name.split(' ').slice(1).join(' ') || '',
+                email: formData.email,
+                password: formData.password,
+                is_staff: true
+            };
+            await api.post('/users/admin/create/', newAdmin);
+            await loadAdmins();
+            setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+            setMessage({ type: 'success', text: `Admin ${formData.name} created successfully!` });
+        } catch (err) {
+            setMessage({ type: 'error', text: err.response?.data?.detail || 'Failed to create admin.' });
         }
-
-        const newAdmin = {
-            name: formData.name,
-            email: formData.email,
-            password: formData.password
-        };
-
-        const updatedAdmins = [...admins, newAdmin];
-        localStorage.setItem('hubmart_admins', JSON.stringify(updatedAdmins));
-        
-        setAdminsList(updatedAdmins);
-        setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-        setMessage({ type: 'success', text: `Admin ${formData.name} created successfully!` });
     };
 
-    const handleDeleteAdmin = (email) => {
-        if (email === 'admin@hubmart.uk') {
+    const handleDeleteAdmin = async (adminObj) => {
+        if (adminObj.email === 'admin@hubmart.uk') {
             setMessage({ type: 'error', text: 'Cannot delete the ROOT master admin.' });
             return;
         }
-        // If we want to remove from localStorage for demo:
-        const admins = JSON.parse(localStorage.getItem('hubmart_admins')) || [];
-        const updatedAdmins = admins.filter(a => a.email !== email);
-        localStorage.setItem('hubmart_admins', JSON.stringify(updatedAdmins));
-        setAdminsList(updatedAdmins);
-        setMessage({ type: 'success', text: 'Admin removed successfully.' });
+        
+        try {
+            // Assuming the backend endpoint accepts the ID
+            await api.delete(`/users/admin/${adminObj.id || adminObj.email}/`);
+            await loadAdmins();
+            setMessage({ type: 'success', text: 'Admin removed successfully.' });
+        } catch (err) {
+            setMessage({ type: 'error', text: 'Failed to delete admin.' });
+        }
     };
 
     if (loading || !user) return <div style={{ padding: '5rem', textAlign: 'center' }}>Loading...</div>;
@@ -169,10 +174,10 @@ const AdminDashboard = () => {
                             <div key={idx} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                        {admin.name.charAt(0).toUpperCase()}
+                                        {(admin.first_name || admin.name || 'A').charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 'bold' }}>{admin.name}</div>
+                                        <div style={{ fontWeight: 'bold' }}>{admin.first_name || admin.name} {admin.last_name || ''}</div>
                                         <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{admin.email}</div>
                                     </div>
                                 </div>
@@ -183,7 +188,7 @@ const AdminDashboard = () => {
                                         </span>
                                     )}
                                     <button 
-                                        onClick={() => handleDeleteAdmin(admin.email)}
+                                        onClick={() => handleDeleteAdmin(admin)}
                                         style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', transition: '0.2s' }}
                                         onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                                         onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}

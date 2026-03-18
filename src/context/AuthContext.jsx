@@ -25,45 +25,33 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password, isAdminLogin = false) => {
-        console.warn("DEMO MODE ACTIVE: Bypassing real authentication");
-        
-        if (isAdminLogin) {
-            let admins = JSON.parse(localStorage.getItem('hubmart_admins'));
-            if (!admins) {
-                // Default Master Admin
-                admins = [{ email: 'admin@hubmart.uk', password: 'admin', name: 'Master Admin' }];
-                localStorage.setItem('hubmart_admins', JSON.stringify(admins));
-            }
+        try {
+            const res = await api.post('/users/auth/login/', { email, password });
             
-            const validAdmin = admins.find(a => a.email === email && a.password === password);
-            if (!validAdmin) {
-                return { success: false, error: 'Invalid admin credentials.' };
+            // Store tokens
+            localStorage.setItem('access_token', res.data.access);
+            if (res.data.refresh) {
+                localStorage.setItem('refresh_token', res.data.refresh);
             }
-            
-            const mockAdminUser = {
-                id: Date.now(),
-                email: validAdmin.email,
-                first_name: validAdmin.name.split(' ')[0] || 'Admin',
-                last_name: validAdmin.name.split(' ').slice(1).join(' ') || '',
-                is_staff: true
-            };
-            setUser(mockAdminUser);
-            localStorage.setItem('access_token', 'admin-demo-token');
-            localStorage.setItem('demo_mode', 'true');
-            return { success: true };
-        }
+            localStorage.removeItem('demo_mode');
 
-        const mockUser = {
-            id: 1,
-            email: email || 'demo@hubmart.uk',
-            first_name: 'Demo',
-            last_name: 'User',
-            is_staff: false
-        };
-        setUser(mockUser);
-        localStorage.setItem('access_token', 'demo-token');
-        localStorage.setItem('demo_mode', 'true');
-        return { success: true };
+            // Fetch user profile
+            const profileRes = await api.get('/users/profiles/me/');
+            const fetchedUser = profileRes.data;
+
+            // Enforce Admin check if requested from /Hubmaster
+            if (isAdminLogin && !fetchedUser.is_staff) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                return { success: false, error: 'Unauthorized: Admin privileges required.' };
+            }
+
+            setUser(fetchedUser);
+            return { success: true };
+        } catch (error) {
+            console.error("Login failed:", error);
+            return { success: false, error: error.response?.data?.detail || 'Invalid email or password.' };
+        }
     };
 
     const logout = () => {
