@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, UserPlus, Users, Package, ArrowRight, Save, LayoutDashboard, Database } from 'lucide-react';
+import { ShieldAlert, UserPlus, Users, Package, ArrowRight, Save, LayoutDashboard, Database, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/index.css';
@@ -64,6 +64,19 @@ const AdminDashboard = () => {
         setMessage({ type: 'success', text: `Admin ${formData.name} created successfully!` });
     };
 
+    const handleDeleteAdmin = (email) => {
+        if (email === 'admin@hubmart.uk') {
+            setMessage({ type: 'error', text: 'Cannot delete the ROOT master admin.' });
+            return;
+        }
+        // If we want to remove from localStorage for demo:
+        const admins = JSON.parse(localStorage.getItem('hubmart_admins')) || [];
+        const updatedAdmins = admins.filter(a => a.email !== email);
+        localStorage.setItem('hubmart_admins', JSON.stringify(updatedAdmins));
+        setAdminsList(updatedAdmins);
+        setMessage({ type: 'success', text: 'Admin removed successfully.' });
+    };
+
     if (loading || !user) return <div style={{ padding: '5rem', textAlign: 'center' }}>Loading...</div>;
 
     return (
@@ -103,7 +116,7 @@ const AdminDashboard = () => {
                             <input 
                                 type="text" name="name" placeholder="John Doe" required
                                 value={formData.name} onChange={handleChange}
-                                style={{ width: '100%', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--input-text)' }}
                             />
                         </div>
 
@@ -112,7 +125,7 @@ const AdminDashboard = () => {
                             <input 
                                 type="email" name="email" placeholder="john@hubmart.uk" required
                                 value={formData.email} onChange={handleChange}
-                                style={{ width: '100%', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white' }}
+                                style={{ width: '100%', padding: '0.75rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--input-text)' }}
                             />
                         </div>
 
@@ -122,7 +135,7 @@ const AdminDashboard = () => {
                                 <input 
                                     type="password" name="password" placeholder="••••••••" required
                                     value={formData.password} onChange={handleChange}
-                                    style={{ width: '100%', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white' }}
+                                    style={{ width: '100%', padding: '0.75rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--input-text)' }}
                                 />
                             </div>
                             <div>
@@ -130,7 +143,7 @@ const AdminDashboard = () => {
                                 <input 
                                     type="password" name="confirmPassword" placeholder="••••••••" required
                                     value={formData.confirmPassword} onChange={handleChange}
-                                    style={{ width: '100%', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white' }}
+                                    style={{ width: '100%', padding: '0.75rem 1rem', background: 'var(--input-bg)', border: '1px solid var(--input-border)', borderRadius: '6px', color: 'var(--input-text)' }}
                                 />
                             </div>
                         </div>
@@ -163,11 +176,22 @@ const AdminDashboard = () => {
                                         <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{admin.email}</div>
                                     </div>
                                 </div>
-                                {admin.email === 'admin@hubmart.uk' && (
-                                    <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
-                                        ROOT
-                                    </span>
-                                )}
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                    {admin.email === 'admin@hubmart.uk' && (
+                                        <span style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+                                            ROOT
+                                        </span>
+                                    )}
+                                    <button 
+                                        onClick={() => handleDeleteAdmin(admin.email)}
+                                        style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', transition: '0.2s' }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                        title="Delete Admin"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
